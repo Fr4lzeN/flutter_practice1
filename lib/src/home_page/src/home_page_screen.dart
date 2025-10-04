@@ -13,18 +13,29 @@ class MyHomePage extends StatelessWidget {
         title: Text(title),
       ),
       body: Center(
-        child: ElevatedButton(
-          onPressed: null,
-          child: const Text("Нажми меня"),
-          style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all(Colors.blue),
-            shape: MaterialStateProperty.all(
-              RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(50),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+                "Я просто текст",
+              style: TextStyle(
+                color: Colors.deepOrange,
               ),
             ),
-          ),
-        ),
+            ElevatedButton(
+              onPressed: null,
+              child: const Text("Нажми меня"),
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Colors.blue),
+                shape: MaterialStateProperty.all(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        )
       ),
     );
   }
