@@ -13,7 +13,10 @@ class MyHomePage extends StatelessWidget {
         title: Text(title),
       ),
       body: const Center(
-        child: const Text('Миняев Михаил Игоревич / ИКБО-06-22 / 22И1183'),
+        child: const Text(
+          'Миняев Михаил Игоревич / ИКБО-06-22 / 22И1183',
+          style: TextStyle(fontSize: 30, color: Colors.green),
+        ),
       ),
     );
   }
