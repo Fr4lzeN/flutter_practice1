@@ -20,25 +20,28 @@ class MyHomePage extends StatelessWidget {
               padding: EdgeInsets.all(16),
               child: Text(
                 "Я просто текст",
-                style: TextStyle(
-                  color: Colors.deepOrange,
-                ),
+                style: TextStyle(color: Colors.deepOrange),
               ),
             ),
-            ElevatedButton(
-              onPressed: null,
-              child: const Text("Нажми меня"),
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Colors.blue),
-                shape: MaterialStateProperty.all(
-                  RoundedRectangleBorder(
+            Container(
+              padding: const EdgeInsets.all(8.0),
+              decoration: BoxDecoration(
+                color: Colors.green,
+                borderRadius: BorderRadius.circular(50),
+              ),
+              child: ElevatedButton(
+                onPressed: null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(50),
                   ),
                 ),
+                child: const Text('Нажми меня'),
               ),
             ),
           ],
-        )
+        ),
       ),
     );
   }
