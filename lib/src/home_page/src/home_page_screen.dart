@@ -12,10 +12,18 @@ class MyHomePage extends StatelessWidget {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(title),
       ),
-      body: const Center(
-        child: const Text(
-          'Миняев Михаил Игоревич / ИКБО-06-22 / 22И1183',
-          style: TextStyle(fontSize: 30, color: Colors.green),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: null,
+          child: const Text("Нажми меня"),
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all(Colors.blue),
+            shape: MaterialStateProperty.all(
+              RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(50),
+              ),
+            ),
+          ),
         ),
       ),
     );
