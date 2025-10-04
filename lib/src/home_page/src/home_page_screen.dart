@@ -16,15 +16,14 @@ class MyHomePage extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
+            Padding(
+              padding: EdgeInsets.all(16),
+              child: Text(
                 "Я просто текст",
-              style: TextStyle(
-                color: Colors.deepOrange,
+                style: TextStyle(
+                  color: Colors.deepOrange,
+                ),
               ),
-            ),
-            SizedBox(
-                width: 200,
-                height: 200,
             ),
             ElevatedButton(
               onPressed: null,
