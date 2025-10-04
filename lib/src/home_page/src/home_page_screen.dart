@@ -13,7 +13,7 @@ class MyHomePage extends StatelessWidget {
         title: Text(title),
       ),
       body: Center(
-        child: Column(
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
@@ -21,6 +21,10 @@ class MyHomePage extends StatelessWidget {
               style: TextStyle(
                 color: Colors.deepOrange,
               ),
+            ),
+            SizedBox(
+                width: 200,
+                height: 200,
             ),
             ElevatedButton(
               onPressed: null,
