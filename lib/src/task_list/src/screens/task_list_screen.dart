@@ -4,6 +4,7 @@ import '../widgets/task_list_item.dart';
 import 'add_task_screen.dart';
 import 'task_detail_screen.dart';
 import 'task_stats_screen.dart';
+import 'category_management_screen.dart';
 
 class TaskListScreen extends StatefulWidget {
   const TaskListScreen({super.key});
@@ -81,11 +82,27 @@ class _TaskListScreenState extends State<TaskListScreen> {
     }
   }
 
-  void _openStats() {
-    Navigator.push(
+  void _openStats() async {
+    final result = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => TaskStatsScreen(tasks: tasks),
+      ),
+    );
+    
+    // Если вернулись с обновленным списком задач
+    if (result != null && result is List<Task>) {
+      setState(() {
+        tasks = result;
+      });
+    }
+  }
+
+  void _openCategoryManagement() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const CategoryManagementScreen(),
       ),
     );
   }
@@ -97,6 +114,10 @@ class _TaskListScreenState extends State<TaskListScreen> {
         title: const Text('Трекер задач'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.category),
+            onPressed: _openCategoryManagement,
+          ),
           IconButton(
             icon: const Icon(Icons.bar_chart),
             onPressed: _openStats,
