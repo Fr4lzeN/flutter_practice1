@@ -335,6 +335,7 @@ class _TaskStatsScreenState extends State<TaskStatsScreen> {
                           itemCount: _filteredTasks.length,
                           itemBuilder: (context, index) {
                             return TaskListItem(
+                              key: ValueKey(_filteredTasks[index].id),
                               task: _filteredTasks[index],
                               onTap: () {},
                             );
