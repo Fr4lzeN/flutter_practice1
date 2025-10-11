@@ -110,14 +110,17 @@ class _TaskListScreenState extends State<TaskListScreen> {
                 style: TextStyle(fontSize: 18, color: Colors.grey),
               ),
             )
-          : ListView.builder(
-              itemCount: tasks.length,
-              itemBuilder: (context, index) {
-                return TaskListItem(
-                  task: tasks[index],
-                  onTap: () => _openTaskDetail(index),
-                );
-              },
+          : SingleChildScrollView(
+              child: Column(
+                children: [
+                  for (int i = 0; i < tasks.length; i++) ...[
+                    TaskListItem(
+                      task: tasks[i],
+                      onTap: () => _openTaskDetail(i),
+                    ),
+                  ],
+                ],
+              ),
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: _addTask,
