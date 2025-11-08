@@ -1,59 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:practice1/src/widgets/app_header.dart';
 import '../models/task_model.dart';
 import '../widgets/task_list_item.dart';
 import 'add_task_screen.dart';
 import 'task_detail_screen.dart';
-import 'task_stats_screen.dart';
-import 'category_management_screen.dart';
 
 class TaskListScreen extends StatefulWidget {
   const TaskListScreen({super.key});
 
   @override
   State<TaskListScreen> createState() => _TaskListScreenState();
+
+  static final List<Task> _tasks = [
+    Task(
+        id: '1',
+        title: 'Изучить Flutter',
+        description: 'Пройти базовый курс по Flutter',
+        priority: 1,
+        isCompleted: false),
+    Task(
+        id: '2',
+        title: 'Купить продукты',
+        description: 'Молоко, хлеб, масло',
+        priority: 2,
+        isCompleted: true),
+  ];
+
+  static List<Task> get tasks => _tasks;
 }
 
 class _TaskListScreenState extends State<TaskListScreen> {
-  List<Task> tasks = [
-    Task(
-      id: '1',
-      title: 'Изучить Flutter',
-      description: 'Пройти базовый курс по Flutter и создать первое приложение',
-      priority: 1,
-      isCompleted: false,
-    ),
-    Task(
-      id: '2',
-      title: 'Купить продукты',
-      description: 'Молоко, хлеб, масло',
-      priority: 2,
-      isCompleted: true,
-    ),
-    Task(
-      id: '3',
-      title: 'Сделать зарядку',
-      description: 'Утренняя зарядка 30 минут',
-      priority: 3,
-      isCompleted: false,
-    ),
-    Task(
-      id: '4',
-      title: 'Прочитать книгу',
-      description: 'Закончить главу по архитектуре приложений',
-      priority: 2,
-      isCompleted: false,
-    ),
-  ];
-
   void _addTask() async {
     final newTask = await Navigator.push<Task>(
       context,
-      MaterialPageRoute(builder: (context) => const AddTaskScreen()),
+      MaterialPageRoute(
+        builder: (context) => const AddTaskScreen(),
+        fullscreenDialog: true,
+      ),
     );
-
     if (newTask != null) {
       setState(() {
-        tasks.add(newTask);
+        TaskListScreen._tasks.add(newTask);
       });
     }
   }
@@ -62,90 +49,39 @@ class _TaskListScreenState extends State<TaskListScreen> {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => TaskDetailScreen(task: tasks[index]),
+        builder: (context) =>
+            TaskDetailScreen(task: TaskListScreen._tasks[index]),
       ),
     );
-
     if (result == 'delete') {
       setState(() {
-        tasks.removeAt(index);
+        TaskListScreen._tasks.removeAt(index);
       });
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Задача удалена')),
-        );
-      }
     } else if (result is Task) {
       setState(() {
-        tasks[index] = result;
+        TaskListScreen._tasks[index] = result;
       });
     }
-  }
-
-  void _openStats() async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => TaskStatsScreen(tasks: tasks),
-      ),
-    );
-    
-    // Если вернулись с обновленным списком задач
-    if (result != null && result is List<Task>) {
-      setState(() {
-        tasks = result;
-      });
-    }
-  }
-
-  void _openCategoryManagement() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const CategoryManagementScreen(),
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Трекер задач'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.category),
-            onPressed: _openCategoryManagement,
-          ),
-          IconButton(
-            icon: const Icon(Icons.bar_chart),
-            onPressed: _openStats,
-          ),
-        ],
+      appBar: const AppHeader(currentPage: AppPage.tasks),
+      body: ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
+        itemCount: TaskListScreen._tasks.length,
+        itemBuilder: (context, index) {
+          return TaskListItem(
+            task: TaskListScreen._tasks[index],
+            onTap: () => _openTaskDetail(index),
+          );
+        },
       ),
-      body: tasks.isEmpty
-          ? const Center(
-              child: Text(
-                'Нет задач',
-                style: TextStyle(fontSize: 18, color: Colors.grey),
-              ),
-            )
-          : SingleChildScrollView(
-              child: Column(
-                children: [
-                  for (int i = 0; i < tasks.length; i++) ...[
-                    TaskListItem(
-                      task: tasks[i],
-                      onTap: () => _openTaskDetail(i),
-                    ),
-                  ],
-                ],
-              ),
-            ),
       floatingActionButton: FloatingActionButton(
         onPressed: _addTask,
         child: const Icon(Icons.add),
+        tooltip: 'Добавить задачу',
       ),
     );
   }

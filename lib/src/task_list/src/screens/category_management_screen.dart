@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:practice1/src/widgets/app_header.dart';
 import '../models/category_model.dart';
 
 class CategoryManagementScreen extends StatefulWidget {
   const CategoryManagementScreen({super.key});
 
   @override
-  State<CategoryManagementScreen> createState() => _CategoryManagementScreenState();
+  State<CategoryManagementScreen> createState() =>
+      _CategoryManagementScreenState();
 }
 
 class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
@@ -47,17 +49,16 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
     ),
   ];
 
-  void _addCategory() {
-    showDialog(
+  void _addCategory() async {
+    final newCategory = await showDialog<TaskCategory>(
       context: context,
-      builder: (context) => _AddCategoryDialog(
-        onSave: (category) {
-          setState(() {
-            categories.add(category);
-          });
-        },
-      ),
+      builder: (context) => const AddCategoryDialog(),
     );
+    if (newCategory != null) {
+      setState(() {
+        categories.add(newCategory);
+      });
+    }
   }
 
   void _deleteCategory(int index) {
@@ -65,7 +66,7 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
     setState(() {
       categories.removeAt(index);
     });
-    
+
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -109,16 +110,7 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Управление категориями'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: _addCategory,
-          ),
-        ],
-      ),
+      appBar: const AppHeader(currentPage: AppPage.categories),
       body: categories.isEmpty
           ? const Center(
               child: Text(
@@ -127,6 +119,8 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
               ),
             )
           : ListView.separated(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
               itemCount: categories.length,
               separatorBuilder: (context, index) => const Divider(
                 height: 1,
@@ -154,7 +148,8 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                       context: context,
                       builder: (context) => AlertDialog(
                         title: const Text('Удалить категорию?'),
-                        content: Text('Вы уверены, что хотите удалить категорию "${category.name}"?'),
+                        content: Text(
+                            'Вы уверены, что хотите удалить категорию "${category.name}"?'),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.of(context).pop(false),
@@ -172,7 +167,8 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                     _deleteCategory(index);
                   },
                   child: Card(
-                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    margin:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: ListTile(
                       leading: CircleAvatar(
                         backgroundColor: _getColorFromString(category.color),
@@ -205,9 +201,9 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                       trailing: IconButton(
                         icon: const Icon(Icons.edit),
                         onPressed: () {
-                          // Можно добавить редактирование категории
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Редактирование будет добавлено')),
+                            const SnackBar(
+                                content: Text('Редактирование будет добавлено')),
                           );
                         },
                       ),
@@ -224,22 +220,27 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
   }
 }
 
-class _AddCategoryDialog extends StatefulWidget {
-  final Function(TaskCategory) onSave;
-
-  const _AddCategoryDialog({required this.onSave});
+class AddCategoryDialog extends StatefulWidget {
+  const AddCategoryDialog({super.key});
 
   @override
-  State<_AddCategoryDialog> createState() => _AddCategoryDialogState();
+  State<AddCategoryDialog> createState() => _AddCategoryDialogState();
 }
 
-class _AddCategoryDialogState extends State<_AddCategoryDialog> {
+class _AddCategoryDialogState extends State<AddCategoryDialog> {
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
   String _selectedColor = 'blue';
 
   final List<String> _availableColors = [
-    'blue', 'green', 'purple', 'red', 'orange', 'yellow', 'pink', 'teal'
+    'blue',
+    'green',
+    'purple',
+    'red',
+    'orange',
+    'yellow',
+    'pink',
+    'teal'
   ];
 
   @override
@@ -264,8 +265,7 @@ class _AddCategoryDialogState extends State<_AddCategoryDialog> {
       color: _selectedColor,
     );
 
-    widget.onSave(newCategory);
-    Navigator.pop(context);
+    Navigator.of(context).pop(newCategory);
   }
 
   Color _getColorFromString(String colorName) {
@@ -295,60 +295,62 @@ class _AddCategoryDialogState extends State<_AddCategoryDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text('Добавить категорию'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextField(
-            controller: _nameController,
-            decoration: const InputDecoration(
-              labelText: 'Название',
-              border: OutlineInputBorder(),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _nameController,
+              decoration: const InputDecoration(
+                labelText: 'Название',
+                border: OutlineInputBorder(),
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _descriptionController,
-            decoration: const InputDecoration(
-              labelText: 'Описание',
-              border: OutlineInputBorder(),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _descriptionController,
+              decoration: const InputDecoration(
+                labelText: 'Описание',
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 2,
             ),
-            maxLines: 2,
-          ),
-          const SizedBox(height: 16),
-          const Text('Цвет:', style: TextStyle(fontWeight: FontWeight.bold)),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            children: _availableColors.map((color) {
-              final isSelected = _selectedColor == color;
-              return GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _selectedColor = color;
-                  });
-                },
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: _getColorFromString(color),
-                    shape: BoxShape.circle,
-                    border: isSelected
-                        ? Border.all(color: Colors.black, width: 3)
+            const SizedBox(height: 16),
+            const Text('Цвет:', style: TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              children: _availableColors.map((color) {
+                final isSelected = _selectedColor == color;
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _selectedColor = color;
+                    });
+                  },
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: _getColorFromString(color),
+                      shape: BoxShape.circle,
+                      border: isSelected
+                          ? Border.all(color: Colors.black, width: 3)
+                          : null,
+                    ),
+                    child: isSelected
+                        ? const Icon(Icons.check, color: Colors.white)
                         : null,
                   ),
-                  child: isSelected
-                      ? const Icon(Icons.check, color: Colors.white)
-                      : null,
-                ),
-              );
-            }).toList(),
-          ),
-        ],
+                );
+              }).toList(),
+            ),
+          ],
+        ),
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.of(context).pop(),
           child: const Text('Отмена'),
         ),
         ElevatedButton(

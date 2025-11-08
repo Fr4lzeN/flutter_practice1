@@ -22,12 +22,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
 
   void _saveTask() {
     if (_titleController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Введите название задачи')),
-      );
       return;
     }
-
     final newTask = Task(
       id: DateTime.now().toString(),
       title: _titleController.text,
@@ -35,7 +31,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
       priority: _selectedPriority,
       isCompleted: false,
     );
-
     Navigator.pop(context, newTask);
   }
 
@@ -44,7 +39,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Добавить задачу'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -90,9 +84,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: _saveTask,
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-              ),
               child: const Text('Сохранить'),
             ),
           ],

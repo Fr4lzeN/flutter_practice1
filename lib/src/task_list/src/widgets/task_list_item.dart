@@ -11,8 +11,8 @@ class TaskListItem extends StatelessWidget {
     required this.onTap,
   });
 
-  Color _getPriorityColor() {
-    switch (task.priority) {
+  Color _getPriorityColor(int priority) {
+    switch (priority) {
       case 1:
         return Colors.red;
       case 2:
@@ -24,8 +24,8 @@ class TaskListItem extends StatelessWidget {
     }
   }
 
-  IconData _getPriorityIcon() {
-    switch (task.priority) {
+  IconData _getPriorityIcon(int priority) {
+    switch (priority) {
       case 1:
         return Icons.priority_high;
       case 2:
@@ -33,7 +33,7 @@ class TaskListItem extends StatelessWidget {
       case 3:
         return Icons.low_priority;
       default:
-        return Icons.flag_outlined;
+        return Icons.help_outline;
     }
   }
 
@@ -44,8 +44,8 @@ class TaskListItem extends StatelessWidget {
       child: ListTile(
         onTap: onTap,
         leading: Icon(
-          _getPriorityIcon(),
-          color: _getPriorityColor(),
+          _getPriorityIcon(task.priority),
+          color: _getPriorityColor(task.priority),
           size: 32,
         ),
         title: Text(
