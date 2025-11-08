@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:practice1/src/navigation/app_router.dart';
 import 'package:practice1/src/widgets/app_header.dart';
 import '../models/task_model.dart';
 import '../widgets/task_list_item.dart';
@@ -20,11 +22,9 @@ class _TaskStatsScreenState extends State<TaskStatsScreen> {
   void _openTaskDetail(Task task) async {
     final index = TaskListScreen.tasks.indexWhere((t) => t.id == task.id);
     if (index != -1) {
-      final result = await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => TaskDetailScreen(task: task),
-        ),
+      final result = await context.push<Object>(
+        AppRouter.taskDetailRoute,
+        extra: task,
       );
       if (result == 'delete') {
         setState(() {
@@ -67,7 +67,7 @@ class _TaskStatsScreenState extends State<TaskStatsScreen> {
     final lowPriorityTasks = tasks.where((task) => task.priority == 3).length;
 
     return Scaffold(
-      appBar: const AppHeader(currentPage: AppPage.stats),
+      appBar: const AppHeader(currentRoute: AppRouter.statsRoute),
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(

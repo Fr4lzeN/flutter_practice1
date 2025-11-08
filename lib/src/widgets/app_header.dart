@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:practice1/src/task_list/src/screens/category_management_screen.dart';
-import 'package:practice1/src/task_list/src/screens/task_list_screen.dart';
-import 'package:practice1/src/task_list/src/screens/task_stats_screen.dart';
-
-enum AppPage { tasks, stats, categories }
+import 'package:go_router/go_router.dart';
+import 'package:practice1/src/navigation/app_router.dart';
 
 class AppHeader extends StatelessWidget implements PreferredSizeWidget {
-  final AppPage currentPage;
+  final String currentRoute;
 
-  const AppHeader({super.key, required this.currentPage});
+  const AppHeader({super.key, required this.currentRoute});
 
   @override
   Widget build(BuildContext context) {
@@ -20,47 +17,36 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
         IconButton(
           icon: const Icon(Icons.list),
           tooltip: 'Список',
-          color: currentPage == AppPage.tasks
+          color: currentRoute == AppRouter.tasksRoute
               ? Theme.of(context).primaryColor
               : null,
           onPressed: () {
-            if (currentPage != AppPage.tasks) {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const TaskListScreen()),
-              );
+            if (currentRoute != AppRouter.tasksRoute) {
+              context.pushReplacement(AppRouter.tasksRoute);
             }
           },
         ),
         IconButton(
           icon: const Icon(Icons.bar_chart),
           tooltip: 'Статистика',
-          color: currentPage == AppPage.stats
+          color: currentRoute == AppRouter.statsRoute
               ? Theme.of(context).primaryColor
               : null,
           onPressed: () {
-            if (currentPage != AppPage.stats) {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const TaskStatsScreen()),
-              );
+            if (currentRoute != AppRouter.statsRoute) {
+              context.pushReplacement(AppRouter.statsRoute);
             }
           },
         ),
         IconButton(
           icon: const Icon(Icons.category),
           tooltip: 'Категории',
-          color: currentPage == AppPage.categories
+          color: currentRoute == AppRouter.categoriesRoute
               ? Theme.of(context).primaryColor
               : null,
           onPressed: () {
-            if (currentPage != AppPage.categories) {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const CategoryManagementScreen()),
-              );
+            if (currentRoute != AppRouter.categoriesRoute) {
+              context.pushReplacement(AppRouter.categoriesRoute);
             }
           },
         ),

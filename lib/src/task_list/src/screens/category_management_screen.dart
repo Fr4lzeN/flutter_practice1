@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:practice1/src/navigation/app_router.dart';
 import 'package:practice1/src/widgets/app_header.dart';
 import '../models/category_model.dart';
 
@@ -110,7 +111,7 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const AppHeader(currentPage: AppPage.categories),
+      appBar: const AppHeader(currentRoute: AppRouter.categoriesRoute),
       body: categories.isEmpty
           ? const Center(
               child: Text(

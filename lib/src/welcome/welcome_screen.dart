@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:practice1/src/task_list/src/screens/task_list_screen.dart';
+import 'package:go_router/go_router.dart';
+import 'package:practice1/src/navigation/app_router.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -24,11 +25,7 @@ class WelcomeScreen extends StatelessWidget {
             const SizedBox(height: 40),
             ElevatedButton(
               onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const TaskListScreen()),
-                );
+                context.pushReplacement(AppRouter.tasksRoute);
               },
               child: const Text('Начать'),
             ),

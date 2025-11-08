@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:practice1/src/navigation/app_router.dart';
 import '../models/task_model.dart';
-import 'edit_task_screen.dart';
 
 class TaskDetailScreen extends StatefulWidget {
   final Task task;
@@ -52,11 +53,9 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
   }
 
   void _editTask() async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EditTaskScreen(task: widget.task),
-      ),
+    final result = await context.push<Object>(
+      AppRouter.editTaskRoute,
+      extra: widget.task,
     );
 
     if (result == 'delete') {

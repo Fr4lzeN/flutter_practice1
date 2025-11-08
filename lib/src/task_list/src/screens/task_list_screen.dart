@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:practice1/src/navigation/app_router.dart';
 import 'package:practice1/src/widgets/app_header.dart';
 import '../models/task_model.dart';
 import '../widgets/task_list_item.dart';
-import 'add_task_screen.dart';
 import 'task_detail_screen.dart';
 
 class TaskListScreen extends StatefulWidget {
@@ -31,13 +32,8 @@ class TaskListScreen extends StatefulWidget {
 
 class _TaskListScreenState extends State<TaskListScreen> {
   void _addTask() async {
-    final newTask = await Navigator.push<Task>(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const AddTaskScreen(),
-        fullscreenDialog: true,
-      ),
-    );
+    final newTask =
+        await context.push<Task>(AppRouter.addTaskRoute);
     if (newTask != null) {
       setState(() {
         TaskListScreen._tasks.add(newTask);
@@ -46,12 +42,9 @@ class _TaskListScreenState extends State<TaskListScreen> {
   }
 
   void _openTaskDetail(int index) async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) =>
-            TaskDetailScreen(task: TaskListScreen._tasks[index]),
-      ),
+    final result = await context.push<Object>(
+      AppRouter.taskDetailRoute,
+      extra: TaskListScreen._tasks[index],
     );
     if (result == 'delete') {
       setState(() {
@@ -67,7 +60,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const AppHeader(currentPage: AppPage.tasks),
+      appBar: const AppHeader(currentRoute: AppRouter.tasksRoute),
       body: ListView.builder(
         physics: const AlwaysScrollableScrollPhysics(),
         itemCount: TaskListScreen._tasks.length,
