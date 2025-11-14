@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:practice1/src/di/app_state.dart';
 import 'package:practice1/src/navigation/app_router.dart';
+import 'package:practice1/src/task_list/src/repository/task_repository.dart';
 import 'package:practice1/src/widgets/app_header.dart';
 import '../models/task_model.dart';
 import '../widgets/task_list_item.dart';
-import 'task_list_screen.dart';
-import 'task_detail_screen.dart';
 
 class TaskStatsScreen extends StatefulWidget {
   const TaskStatsScreen({super.key});
@@ -15,12 +15,23 @@ class TaskStatsScreen extends StatefulWidget {
 }
 
 class _TaskStatsScreenState extends State<TaskStatsScreen> {
+  late TaskRepository _taskRepository;
   String _selectedFilter = 'all';
 
-  List<Task> get tasks => TaskListScreen.tasks;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final appState = AppState.of(context);
+    if (appState != null) {
+      _taskRepository = appState.taskRepository;
+    }
+  }
+
+  List<Task> get tasks => _taskRepository.getTasks();
 
   void _openTaskDetail(Task task) async {
-    final index = TaskListScreen.tasks.indexWhere((t) => t.id == task.id);
+    final taskList = _taskRepository.getTasks();
+    final index = taskList.indexWhere((t) => t.id == task.id);
     if (index != -1) {
       final result = await context.push<Object>(
         AppRouter.taskDetailRoute,
@@ -28,11 +39,11 @@ class _TaskStatsScreenState extends State<TaskStatsScreen> {
       );
       if (result == 'delete') {
         setState(() {
-          TaskListScreen.tasks.removeAt(index);
+          _taskRepository.deleteTask(index);
         });
       } else if (result is Task) {
         setState(() {
-          TaskListScreen.tasks[index] = result;
+          _taskRepository.updateTask(index, result);
         });
       }
     }
