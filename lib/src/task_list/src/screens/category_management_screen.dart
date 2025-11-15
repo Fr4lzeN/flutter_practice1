@@ -1,88 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:practice1/src/cubit/category_cubit.dart';
 import 'package:practice1/src/navigation/app_router.dart';
 import 'package:practice1/src/widgets/app_header.dart';
 import '../models/category_model.dart';
 
-class CategoryManagementScreen extends StatefulWidget {
+class CategoryManagementScreen extends StatelessWidget {
   const CategoryManagementScreen({super.key});
 
-  @override
-  State<CategoryManagementScreen> createState() =>
-      _CategoryManagementScreenState();
-}
-
-class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
-  List<TaskCategory> categories = [
-    TaskCategory(
-      id: '1',
-      name: 'Работа',
-      description: 'Задачи связанные с работой',
-      color: 'blue',
-      taskCount: 5,
-    ),
-    TaskCategory(
-      id: '2',
-      name: 'Личные',
-      description: 'Личные дела и планы',
-      color: 'green',
-      taskCount: 3,
-    ),
-    TaskCategory(
-      id: '3',
-      name: 'Учеба',
-      description: 'Образовательные задачи',
-      color: 'purple',
-      taskCount: 2,
-    ),
-    TaskCategory(
-      id: '4',
-      name: 'Здоровье',
-      description: 'Задачи по здоровью и спорту',
-      color: 'red',
-      taskCount: 1,
-    ),
-    TaskCategory(
-      id: '5',
-      name: 'Покупки',
-      description: 'Список покупок и расходов',
-      color: 'orange',
-      taskCount: 4,
-    ),
-  ];
-
-  void _addCategory() async {
+  void _addCategory(BuildContext context) async {
     final newCategory = await showDialog<TaskCategory>(
       context: context,
       builder: (context) => const AddCategoryDialog(),
     );
-    if (newCategory != null) {
-      setState(() {
-        categories.add(newCategory);
-      });
+    if (newCategory != null && context.mounted) {
+      context.read<CategoryCubit>().addCategory(newCategory);
     }
   }
 
-  void _deleteCategory(int index) {
-    final deletedCategory = categories[index];
-    setState(() {
-      categories.removeAt(index);
-    });
+  void _deleteCategory(
+      BuildContext context, int index, TaskCategory category) {
+    context.read<CategoryCubit>().deleteCategory(index);
 
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Категория "${deletedCategory.name}" удалена'),
-          action: SnackBarAction(
-            label: 'Отменить',
-            onPressed: () {
-              setState(() {
-                categories.insert(index, deletedCategory);
-              });
-            },
-          ),
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Категория "${category.name}" удалена'),
+        action: SnackBarAction(
+          label: 'Отменить',
+          onPressed: () {
+            context.read<CategoryCubit>().insertCategory(index, category);
+          },
         ),
-      );
-    }
+      ),
+    );
   }
 
   Color _getColorFromString(String colorName) {
@@ -110,7 +60,9 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return BlocBuilder<CategoryCubit, List<TaskCategory>>(
+      builder: (context, categories) {
+        return Scaffold(
       appBar: const AppHeader(currentRoute: AppRouter.categoriesRoute),
       body: categories.isEmpty
           ? const Center(
@@ -165,7 +117,7 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                     );
                   },
                   onDismissed: (direction) {
-                    _deleteCategory(index);
+                    _deleteCategory(context, index, category);
                   },
                   child: Card(
                     margin:
@@ -213,10 +165,12 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                 );
               },
             ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _addCategory,
-        child: const Icon(Icons.add),
-      ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () => _addCategory(context),
+            child: const Icon(Icons.add),
+          ),
+        );
+      },
     );
   }
 }
