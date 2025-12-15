@@ -50,6 +50,66 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
             }
           },
         ),
+        IconButton(
+          icon: const Icon(Icons.label),
+          tooltip: 'Теги',
+          color: currentRoute == AppRouter.tagsRoute
+              ? Theme.of(context).primaryColor
+              : null,
+          onPressed: () {
+            if (currentRoute != AppRouter.tagsRoute) {
+              context.pushReplacement(AppRouter.tagsRoute);
+            }
+          },
+        ),
+        IconButton(
+          icon: const Icon(Icons.checklist),
+          tooltip: 'Подзадачи',
+          color: currentRoute == AppRouter.subtasksRoute
+              ? Theme.of(context).primaryColor
+              : null,
+          onPressed: () {
+            if (currentRoute != AppRouter.subtasksRoute) {
+              context.pushReplacement(AppRouter.subtasksRoute);
+            }
+          },
+        ),
+        IconButton(
+          icon: const Icon(Icons.notifications),
+          tooltip: 'Напоминания',
+          color: currentRoute == AppRouter.remindersRoute
+              ? Theme.of(context).primaryColor
+              : null,
+          onPressed: () {
+            if (currentRoute != AppRouter.remindersRoute) {
+              context.pushReplacement(AppRouter.remindersRoute);
+            }
+          },
+        ),
+        IconButton(
+          icon: const Icon(Icons.person),
+          tooltip: 'Профиль',
+          color: currentRoute == AppRouter.profileRoute
+              ? Theme.of(context).primaryColor
+              : null,
+          onPressed: () {
+            if (currentRoute != AppRouter.profileRoute) {
+              context.pushReplacement(AppRouter.profileRoute);
+            }
+          },
+        ),
+        IconButton(
+          icon: const Icon(Icons.settings),
+          tooltip: 'Настройки',
+          color: currentRoute == AppRouter.settingsRoute
+              ? Theme.of(context).primaryColor
+              : null,
+          onPressed: () {
+            if (currentRoute != AppRouter.settingsRoute) {
+              context.pushReplacement(AppRouter.settingsRoute);
+            }
+          },
+        ),
       ],
     );
   }

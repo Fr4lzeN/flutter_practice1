@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:practice1/src/task_list/src/models/task_model.dart';
 import 'package:practice1/src/task_list/src/screens/add_task_screen.dart';
@@ -8,6 +7,11 @@ import 'package:practice1/src/task_list/src/screens/task_detail_screen.dart';
 import 'package:practice1/src/task_list/src/screens/task_list_screen.dart';
 import 'package:practice1/src/task_list/src/screens/task_stats_screen.dart';
 import 'package:practice1/src/welcome/welcome_screen.dart';
+import 'package:practice1/src/settings/settings.dart';
+import 'package:practice1/src/tags/tags.dart';
+import 'package:practice1/src/subtasks/subtasks.dart';
+import 'package:practice1/src/profile/profile.dart';
+import 'package:practice1/src/reminders/reminders.dart';
 
 class AppRouter {
   static const String welcomeRoute = '/';
@@ -17,6 +21,11 @@ class AppRouter {
   static const String addTaskRoute = '/add-task';
   static const String taskDetailRoute = '/task-detail';
   static const String editTaskRoute = '/edit-task';
+  static const String settingsRoute = '/settings';
+  static const String tagsRoute = '/tags';
+  static const String subtasksRoute = '/subtasks';
+  static const String profileRoute = '/profile';
+  static const String remindersRoute = '/reminders';
 
   static final GoRouter router = GoRouter(
     initialLocation: tasksRoute,
@@ -67,6 +76,41 @@ class AppRouter {
           final task = state.extra as Task;
           return EditTaskScreen(task: task);
         },
+      ),
+      GoRoute(
+        path: settingsRoute,
+        name: 'settings',
+        pageBuilder: (context, state) => const NoTransitionPage(
+          child: SettingsScreen(),
+        ),
+      ),
+      GoRoute(
+        path: tagsRoute,
+        name: 'tags',
+        pageBuilder: (context, state) => const NoTransitionPage(
+          child: TagListScreen(),
+        ),
+      ),
+      GoRoute(
+        path: subtasksRoute,
+        name: 'subtasks',
+        pageBuilder: (context, state) => const NoTransitionPage(
+          child: SubtaskListScreen(),
+        ),
+      ),
+      GoRoute(
+        path: profileRoute,
+        name: 'profile',
+        pageBuilder: (context, state) => const NoTransitionPage(
+          child: ProfileScreen(),
+        ),
+      ),
+      GoRoute(
+        path: remindersRoute,
+        name: 'reminders',
+        pageBuilder: (context, state) => const NoTransitionPage(
+          child: ReminderListScreen(),
+        ),
       ),
     ],
   );
