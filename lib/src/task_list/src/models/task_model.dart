@@ -4,6 +4,7 @@ class Task {
   final String description;
   final int priority;
   final bool isCompleted;
+  final String? categoryId; // Одна категория на задачу
 
   Task({
     required this.id,
@@ -11,6 +12,7 @@ class Task {
     required this.description,
     required this.priority,
     required this.isCompleted,
+    this.categoryId,
   });
 
   Task copyWith({
@@ -19,6 +21,8 @@ class Task {
     String? description,
     int? priority,
     bool? isCompleted,
+    String? categoryId,
+    bool clearCategory = false,
   }) {
     return Task(
       id: id ?? this.id,
@@ -26,6 +30,7 @@ class Task {
       description: description ?? this.description,
       priority: priority ?? this.priority,
       isCompleted: isCompleted ?? this.isCompleted,
+      categoryId: clearCategory ? null : (categoryId ?? this.categoryId),
     );
   }
 }

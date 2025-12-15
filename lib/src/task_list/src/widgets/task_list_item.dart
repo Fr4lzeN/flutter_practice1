@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import '../models/task_model.dart';
+import '../models/category_model.dart';
 
 class TaskListItem extends StatelessWidget {
   final Task task;
   final VoidCallback onTap;
+  final TaskCategory? category;
 
   const TaskListItem({
     super.key,
     required this.task,
     required this.onTap,
+    this.category,
   });
 
   Color _getPriorityColor(int priority) {
@@ -37,6 +40,29 @@ class TaskListItem extends StatelessWidget {
     }
   }
 
+  Color _getColorFromString(String colorName) {
+    switch (colorName.toLowerCase()) {
+      case 'blue':
+        return Colors.blue;
+      case 'green':
+        return Colors.green;
+      case 'purple':
+        return Colors.purple;
+      case 'red':
+        return Colors.red;
+      case 'orange':
+        return Colors.orange;
+      case 'yellow':
+        return Colors.yellow;
+      case 'pink':
+        return Colors.pink;
+      case 'teal':
+        return Colors.teal;
+      default:
+        return Colors.grey;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -55,6 +81,29 @@ class TaskListItem extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
+        subtitle: category != null
+            ? Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 12,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: _getColorFromString(category!.color),
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    category!.name,
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              )
+            : null,
         trailing: task.isCompleted
             ? const Icon(Icons.check_circle, color: Colors.green)
             : const Icon(Icons.circle_outlined, color: Colors.grey),

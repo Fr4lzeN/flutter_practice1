@@ -10,13 +10,15 @@ class TaskListCubit extends Cubit<List<Task>> {
             description: 'Пройти базовый курс по Flutter',
             priority: 1,
             isCompleted: false,
+            categoryId: '3', // Учеба
           ),
           Task(
             id: '2',
             title: 'Купить продукты',
             description: 'Молоко, хлеб, масло',
             priority: 2,
-            isCompleted: true,
+            isCompleted: false,
+            categoryId: '5', // Покупки
           ),
         ]);
 

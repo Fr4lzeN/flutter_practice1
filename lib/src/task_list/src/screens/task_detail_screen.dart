@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:practice1/src/navigation/app_router.dart';
+import 'package:practice1/src/subtasks/subtasks.dart';
 import '../models/task_model.dart';
 
 class TaskDetailScreen extends StatefulWidget {
@@ -82,7 +84,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
           ),
         ],
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -185,6 +187,9 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                 },
               ),
             ),
+            const SizedBox(height: 16),
+            // Секция подзадач
+            _buildSubtasksSection(context),
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: _saveAndReturn,
@@ -195,6 +200,127 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildSubtasksSection(BuildContext context) {
+    return BlocBuilder<SubtaskCubit, List<Subtask>>(
+      builder: (context, allSubtasks) {
+        final subtasks = context.read<SubtaskCubit>().getSubtasksForTask(widget.task.id);
+        final completedCount = subtasks.where((s) => s.isCompleted).length;
+
+        return Card(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Подзадачи (${completedCount}/${subtasks.length})',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.add_circle, color: Colors.green),
+                      tooltip: 'Добавить подзадачу',
+                      onPressed: () => _showAddSubtaskDialog(context),
+                    ),
+                  ],
+                ),
+              ),
+              if (subtasks.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  child: Text(
+                    'Нет подзадач',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                )
+              else
+                ...subtasks.map((subtask) => ListTile(
+                      leading: Checkbox(
+                        value: subtask.isCompleted,
+                        onChanged: (_) {
+                          context.read<SubtaskCubit>().toggleSubtask(subtask.id);
+                        },
+                      ),
+                      title: Text(
+                        subtask.title,
+                        style: TextStyle(
+                          decoration: subtask.isCompleted
+                              ? TextDecoration.lineThrough
+                              : null,
+                          color: subtask.isCompleted ? Colors.grey : null,
+                        ),
+                      ),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete, size: 20, color: Colors.red),
+                        onPressed: () {
+                          context.read<SubtaskCubit>().deleteSubtask(subtask.id);
+                        },
+                      ),
+                    )),
+              if (subtasks.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  child: LinearProgressIndicator(
+                    value: subtasks.isEmpty ? 0 : completedCount / subtasks.length,
+                    backgroundColor: Colors.grey[300],
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showAddSubtaskDialog(BuildContext context) {
+    final controller = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Новая подзадача'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(
+            labelText: 'Название подзадачи',
+            border: OutlineInputBorder(),
+          ),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('Отмена'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (controller.text.isNotEmpty) {
+                final subtaskCubit = context.read<SubtaskCubit>();
+                final existingSubtasks = subtaskCubit.getSubtasksForTask(widget.task.id);
+
+                final newSubtask = Subtask(
+                  id: DateTime.now().toString(),
+                  taskId: widget.task.id,
+                  title: controller.text,
+                  orderIndex: existingSubtasks.length,
+                );
+
+                subtaskCubit.addSubtask(newSubtask);
+                Navigator.of(dialogContext).pop();
+              }
+            },
+            child: const Text('Добавить'),
+          ),
+        ],
       ),
     );
   }

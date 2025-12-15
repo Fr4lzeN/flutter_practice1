@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:practice1/src/cubit/category_cubit.dart';
+import 'package:practice1/src/cubit/task_list_cubit.dart';
 import 'package:practice1/src/navigation/app_router.dart';
 import 'package:practice1/src/widgets/app_header.dart';
 import '../models/category_model.dart';
@@ -58,8 +59,94 @@ class CategoryManagementScreen extends StatelessWidget {
     }
   }
 
+  void _showManageTasksDialog(BuildContext context, TaskCategory category) {
+    final taskListCubit = context.read<TaskListCubit>();
+    final tasks = taskListCubit.state;
+    // Задачи, которые принадлежат этой категории
+    final selectedTaskIds = tasks
+        .where((t) => t.categoryId == category.id)
+        .map((t) => t.id)
+        .toSet();
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: Text('Задачи для "${category.name}"'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: tasks.isEmpty
+                ? const Center(
+                    child: Text('Нет доступных задач'),
+                  )
+                : ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: tasks.length,
+                    itemBuilder: (context, index) {
+                      final task = tasks[index];
+                      final isSelected = selectedTaskIds.contains(task.id);
+                      return CheckboxListTile(
+                        title: Text(task.title),
+                        subtitle: Text(
+                          task.isCompleted ? 'Завершена' : 'Активна',
+                          style: TextStyle(
+                            color: task.isCompleted ? Colors.green : Colors.orange,
+                          ),
+                        ),
+                        value: isSelected,
+                        onChanged: (value) {
+                          setState(() {
+                            if (value == true) {
+                              selectedTaskIds.add(task.id);
+                            } else {
+                              selectedTaskIds.remove(task.id);
+                            }
+                          });
+                        },
+                      );
+                    },
+                  ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('Отмена'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // Обновляем categoryId для каждой задачи
+                for (int i = 0; i < tasks.length; i++) {
+                  final task = tasks[i];
+                  final shouldBelongToCategory = selectedTaskIds.contains(task.id);
+                  final currentlyBelongs = task.categoryId == category.id;
+
+                  if (shouldBelongToCategory && !currentlyBelongs) {
+                    // Добавить задачу в категорию
+                    taskListCubit.updateTask(i, task.copyWith(categoryId: category.id));
+                  } else if (!shouldBelongToCategory && currentlyBelongs) {
+                    // Убрать задачу из категории
+                    taskListCubit.updateTask(i, task.copyWith(clearCategory: true));
+                  }
+                }
+                Navigator.of(dialogContext).pop();
+              },
+              child: const Text('Сохранить'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Слушаем изменения задач для обновления счётчика
+    final tasks = context.watch<TaskListCubit>().state;
+
+    int getTaskCountForCategory(String categoryId) {
+      return tasks.where((t) => t.categoryId == categoryId).length;
+    }
+
     return BlocBuilder<CategoryCubit, List<TaskCategory>>(
       builder: (context, categories) {
         return Scaffold(
@@ -143,7 +230,7 @@ class CategoryManagementScreen extends StatelessWidget {
                           Text(category.description),
                           const SizedBox(height: 4),
                           Text(
-                            'Задач: ${category.taskCount}',
+                            'Задач: ${getTaskCountForCategory(category.id)}',
                             style: TextStyle(
                               color: Colors.grey[600],
                               fontSize: 12,
@@ -151,14 +238,24 @@ class CategoryManagementScreen extends StatelessWidget {
                           ),
                         ],
                       ),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.edit),
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text('Редактирование будет добавлено')),
-                          );
-                        },
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.playlist_add),
+                            tooltip: 'Управление задачами',
+                            onPressed: () => _showManageTasksDialog(context, category),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.edit),
+                            onPressed: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text('Редактирование будет добавлено')),
+                              );
+                            },
+                          ),
+                        ],
                       ),
                     ),
                   ),

@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:practice1/src/cubit/task_list_cubit.dart';
+import 'package:practice1/src/cubit/category_cubit.dart';
 import 'package:practice1/src/navigation/app_router.dart';
 import 'package:practice1/src/widgets/app_header.dart';
+import 'package:practice1/src/settings/settings.dart';
 import '../models/task_model.dart';
 import '../widgets/task_list_item.dart';
 
@@ -34,26 +36,51 @@ class TaskListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<TaskListCubit, List<Task>>(
-      builder: (context, tasks) {
+    final categoryCubit = context.watch<CategoryCubit>();
 
-        return Scaffold(
-          appBar: const AppHeader(currentRoute: AppRouter.tasksRoute),
-          body: ListView.builder(
-            physics: const AlwaysScrollableScrollPhysics(),
-            itemCount: tasks.length,
-            itemBuilder: (context, index) {
-              return TaskListItem(
-                task: tasks[index],
-                onTap: () => _openTaskDetail(context, index, tasks[index]),
-              );
-            },
-          ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () => _addTask(context),
-            tooltip: 'Добавить задачу',
-            child: const Icon(Icons.add),
-          ),
+    return BlocBuilder<SettingsCubit, AppSettings>(
+      builder: (context, settings) {
+        return BlocBuilder<TaskListCubit, List<Task>>(
+          builder: (context, allTasks) {
+            // Фильтрация завершенных задач на основе настроек
+            final tasks = settings.showCompletedTasks
+                ? allTasks
+                : allTasks.where((task) => !task.isCompleted).toList();
+
+            return Scaffold(
+              appBar: const AppHeader(currentRoute: AppRouter.tasksRoute),
+              body: tasks.isEmpty
+                  ? Center(
+                      child: Text(
+                        settings.showCompletedTasks
+                            ? 'Нет задач'
+                            : 'Нет активных задач',
+                        style: const TextStyle(fontSize: 18, color: Colors.grey),
+                      ),
+                    )
+                  : ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      itemCount: tasks.length,
+                      itemBuilder: (context, index) {
+                        final task = tasks[index];
+                        // Находим оригинальный индекс в allTasks для операций
+                        final originalIndex = allTasks.indexOf(task);
+                        // Получаем категорию задачи
+                        final category = categoryCubit.getCategoryById(task.categoryId);
+                        return TaskListItem(
+                          task: task,
+                          category: category,
+                          onTap: () => _openTaskDetail(context, originalIndex, task),
+                        );
+                      },
+                    ),
+              floatingActionButton: FloatingActionButton(
+                onPressed: () => _addTask(context),
+                tooltip: 'Добавить задачу',
+                child: const Icon(Icons.add),
+              ),
+            );
+          },
         );
       },
     );

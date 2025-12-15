@@ -9,40 +9,39 @@ class CategoryCubit extends Cubit<List<TaskCategory>> {
             name: 'Работа',
             description: 'Задачи связанные с работой',
             color: 'blue',
-            taskCount: 5,
           ),
           TaskCategory(
             id: '2',
             name: 'Личные',
             description: 'Личные дела и планы',
             color: 'green',
-            taskCount: 3,
           ),
           TaskCategory(
             id: '3',
             name: 'Учеба',
             description: 'Образовательные задачи',
             color: 'purple',
-            taskCount: 2,
           ),
           TaskCategory(
             id: '4',
             name: 'Здоровье',
             description: 'Задачи по здоровью и спорту',
             color: 'red',
-            taskCount: 1,
           ),
           TaskCategory(
             id: '5',
             name: 'Покупки',
             description: 'Список покупок и расходов',
             color: 'orange',
-            taskCount: 4,
           ),
         ]);
 
   void addCategory(TaskCategory category) {
     emit([...state, category]);
+  }
+
+  void updateCategory(String id, TaskCategory updatedCategory) {
+    emit(state.map((cat) => cat.id == id ? updatedCategory : cat).toList());
   }
 
   void deleteCategory(int index) {
@@ -53,11 +52,24 @@ class CategoryCubit extends Cubit<List<TaskCategory>> {
     }
   }
 
+  void deleteCategoryById(String id) {
+    emit(state.where((cat) => cat.id != id).toList());
+  }
+
   void insertCategory(int index, TaskCategory category) {
     if (index >= 0 && index <= state.length) {
       final newState = [...state];
       newState.insert(index, category);
       emit(newState);
+    }
+  }
+
+  TaskCategory? getCategoryById(String? id) {
+    if (id == null) return null;
+    try {
+      return state.firstWhere((cat) => cat.id == id);
+    } catch (_) {
+      return null;
     }
   }
 }
